@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id               String            @id @default(uuid())
+  email            String            @unique
+  name             String
+  password         String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  adoptionRequests AdoptionRequest[]
+
+  @@map("users")
+}
+
+model Pet {
+  id                   String            @id @default(uuid())
+  name                 String
+  species              String
+  breed                String
+  age                  Int
+  size                 String
+  location             String
+  description          String
+  temperament          String
+  medicalHistory       String
+  adoptionRequirements String
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  adoptionRequests      AdoptionRequest[]
+
+  @@map("pets")
+}
+
+model AdoptionRequest {
+  id                     String                @id @default(uuid())
+  userId                 String
+  petId                  String
+  status                 adoptionRequestStatus @default(PENDING)
+  petOwnershipExperience String
+  user                   User                  @relation(fields: [userId], references: [id])
+  pet                    Pet                   @relation(fields: [petId], references: [id])
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+
+  @@map("adoptionrequests")
+}
+
+enum adoptionRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
