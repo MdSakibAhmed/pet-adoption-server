@@ -6,7 +6,7 @@ const router = Router();
 
 const routeMaker = (routesData: TRoutMaker[]) => {
   routesData.forEach((route) => {
-    (router as any)[route.method](route.path, validateRequest, route.controller);
+    (router as any)[route.method](route.path, route.controller);
   });
   return router;
 };

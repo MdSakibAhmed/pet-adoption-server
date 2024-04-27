@@ -1,8 +1,9 @@
 import { RequestHandler } from "express";
 import { authServices } from "./auth.service";
 import httpStatus from "http-status";
+import catchAsync from "../../../shared/catchAsync";
 
-const login: RequestHandler = async (req, res, next) => {
+const login = catchAsync( async (req, res, next) => {
   const result = await authServices.loginFromDB(req.body);
 
   res.send({
@@ -11,9 +12,9 @@ const login: RequestHandler = async (req, res, next) => {
     message: "user logged in  successfully",
     data: result,
   });
-};
+});
 
-const getProfile: RequestHandler = async (req, res, next) => {
+const getProfile = catchAsync( async (req, res, next) => {
   const token = req.headers.authorization as string;
   const result = await authServices.getProfileFromDB(token);
 
@@ -23,9 +24,9 @@ const getProfile: RequestHandler = async (req, res, next) => {
     message: "user profile retrieved  successfully",
     data: result,
   });
-};
+});
 
-const updateProfile: RequestHandler = async (req, res, next) => {
+const updateProfile = catchAsync( async (req, res, next) => {
   const token = req.headers.authorization as string;
   console.log("token", token);
   const body = req.body;
@@ -38,7 +39,7 @@ const updateProfile: RequestHandler = async (req, res, next) => {
     message: "user profile updated  successfully",
     data: result,
   });
-};
+});
 
 export const authControllers = {
   login,

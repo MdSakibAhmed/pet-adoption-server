@@ -1,8 +1,9 @@
 import { RequestHandler } from "express";
 import { userServices } from "./user.service";
 import httpStatus from "http-status";
+import catchAsync from "../../../shared/catchAsync";
 
-const register: RequestHandler = async (req, res, next) => {
+const register = catchAsync( async (req, res, next) => {
   const newUser = req.body;
 
   const result = await userServices.registerIntoDB(newUser);
@@ -13,7 +14,7 @@ const register: RequestHandler = async (req, res, next) => {
     message: "user registered successfully",
     data: result,
   });
-};
+});
 
 export const userControllers = {
   register,

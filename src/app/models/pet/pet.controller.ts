@@ -3,8 +3,9 @@ import { petServices } from "./pet.service";
 import httpStatus from "http-status";
 import { petFilterableFields, petSearchAbleFields } from "./pet.const";
 import pick from "../../../shared/pick";
+import catchAsync from "../../../shared/catchAsync";
 
-const addPet: RequestHandler = async (req, res, next) => {
+const addPet: RequestHandler = catchAsync( async (req, res, next) => {
   console.log(req.body);
 
   const result = await petServices.addPetIntoDB(req.body);
@@ -14,9 +15,9 @@ const addPet: RequestHandler = async (req, res, next) => {
     message: "pet created successfully",
     data: result,
   });
-};
+});
 
-const getAllPet: RequestHandler = async (req, res, next) => {
+const getAllPet = catchAsync( async(req, res, next) => {
   const filters = pick(req.query, petFilterableFields);
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
   console.log(options);
@@ -29,9 +30,9 @@ const getAllPet: RequestHandler = async (req, res, next) => {
     meta: result.meta,
     data: result.data,
   });
-};
+});
 
-const updatePet: RequestHandler = async (req, res, next) => {
+const updatePet =  catchAsync( async (req, res, next) => {
   const token = req.headers.authorization as string;
   const id = req.params.petId;
   const body = req.body;
@@ -44,7 +45,7 @@ const updatePet: RequestHandler = async (req, res, next) => {
     message: "pet info  updated  successfully",
     data: result,
   });
-};
+});
 export const petController = {
   addPet,
   getAllPet,
