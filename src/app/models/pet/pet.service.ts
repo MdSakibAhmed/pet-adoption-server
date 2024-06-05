@@ -6,12 +6,13 @@ import { IPetFilterRequest } from "./pet.interface";
 import { paginationHelper } from "../../../helper/paginationHelper";
 import { orderOptions, petSearchAbleFields, sortOptions } from "./pet.const";
 import { IPaginationOptions } from "../../../interface/pagination";
+import { RequestHandler } from "express";
 
 const addPetIntoDB = async (payLoad: Pet) => {
   const newPet = await prisma.pet.create({ data: payLoad });
-  const petWithoutCreatedAt = exclude(newPet, ["createdAt", "updatedAt"]);
+  // const petWithoutCreatedAt = exclude(newPet, ["createdAt", "updatedAt"]);
 
-  return petWithoutCreatedAt;
+  return newPet;
 };
 
 const getAllPetFromDB = async (
@@ -21,8 +22,8 @@ const getAllPetFromDB = async (
   const { page, limit, skip } = paginationHelper.calculatePagination(options);
   const { searchTerm, ...filterData } = params;
 
-  const andCondions= [];
-console.log(searchTerm);
+  const andCondions = [];
+  console.log(searchTerm, "25");
   //console.log(filterData);
   if (params.searchTerm) {
     andCondions.push({
@@ -34,7 +35,7 @@ console.log(searchTerm);
       })),
     });
   }
-
+  console.log(andCondions);
   if (Object.keys(filterData).length > 0) {
     andCondions.push({
       AND: Object.keys(filterData).map((key) => ({
@@ -52,19 +53,21 @@ console.log(searchTerm);
     skip,
     take: limit,
     orderBy:
-      options.sortBy && sortOptions.includes(options.sortBy) && options.sortOrder && orderOptions.includes(options.sortOrder)
+      options.sortBy &&
+      sortOptions.includes(options.sortBy) &&
+      options.sortOrder &&
+      orderOptions.includes(options.sortOrder)
         ? {
             [options.sortBy]: options.sortOrder,
           }
         : {
             createdAt: "asc",
-          }
+          },
   });
 
   const total = await prisma.pet.count({
     where: whereConditons,
   });
-
 
   return {
     meta: {
@@ -76,7 +79,11 @@ console.log(searchTerm);
   };
 };
 
-const updatePetIntoDB = (
+const getSinglePetFromDB = async (petId: string) => {
+  const result = await prisma.pet.findUniqueOrThrow({ where: { id: petId } });
+  return result;
+};
+const updatePetIntoDB = async (
   token: string,
   petId: string,
   payLoad: Partial<Pet>
@@ -87,11 +94,27 @@ const updatePetIntoDB = (
   ) as JwtPayload;
   console.log("decoded", decoded);
 
-  const updatePet = prisma.pet.update({ where: { id: petId }, data: payLoad });
+  const updatePet = await prisma.pet.update({
+    where: { id: petId },
+    data: payLoad,
+  });
+  return updatePet;
+};
+
+const deletePetFromDB = async (token: string, petId: string) => {
+  const decoded: JwtPayload = jwt.verify(
+    token,
+    process.env.JWT_SECRET_KEY as string
+  ) as JwtPayload;
+  console.log("decoded", decoded);
+
+  const updatePet = await prisma.pet.delete({ where: { id: petId } });
   return updatePet;
 };
 export const petServices = {
   addPetIntoDB,
   getAllPetFromDB,
   updatePetIntoDB,
+  getSinglePetFromDB,
+  deletePetFromDB,
 };

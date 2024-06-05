@@ -41,8 +41,25 @@ const updateProfile = catchAsync( async (req, res, next) => {
   });
 });
 
+const changePassword = catchAsync( async (req, res, next) => {
+  const token = req.headers.authorization as string;
+  // console.log("token", token);
+  const body = req.body;
+
+  const result = await authServices.changePasswordFromDB(token, body);
+
+  res.send({
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "password changed  successfully",
+    data: null,
+  });
+});
+
+
 export const authControllers = {
   login,
   getProfile,
   updateProfile,
+  changePassword
 };

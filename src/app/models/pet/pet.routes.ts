@@ -13,9 +13,19 @@ const petRoutes: TRoutMaker[] = [
     controller: petController.getAllPet,
   },
   {
-    method: "put",
+    method: "get",
+    path: "/pets/:petId",
+    controller: petController.getSinglePet,
+  },
+  {
+    method: "patch",
     path: "/pets/:petId",
     controller: petController.updatePet,
+  },
+  {
+    method: "delete",
+    path: "/pets/:petId",
+    controller: petController.deletePet,
   },
 ];
 

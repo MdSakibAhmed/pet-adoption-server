@@ -1,8 +1,8 @@
 import routeMaker from "../../../helper/routeMaker";
 import { TRoutMaker } from "../../../interface/routeMaker.interface";
-import { petAdaptionRequestController } from "./petAdoption.controller";
+import { petAdaptionRequestController } from "./petAdoptionRequest.controller";
 
-export const petAdaptionRoutes: TRoutMaker[] = [
+export const petAdaptionRequestRoutes: TRoutMaker[] = [
   {
     method: "post",
     path: "/adoption-request",
@@ -14,7 +14,7 @@ export const petAdaptionRoutes: TRoutMaker[] = [
     controller: petAdaptionRequestController.getPetAdaptionRequests,
   },
   {
-    method:"put",
+    method:"patch",
     path:"/adoption-request/:requestId",
     controller:petAdaptionRequestController.updateAdaptionRequest
   }

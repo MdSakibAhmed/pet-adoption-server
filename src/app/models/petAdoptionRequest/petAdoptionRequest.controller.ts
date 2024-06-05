@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { petAdaptionRequestServices } from "./petAdoptionService";
+import { petAdaptionRequestServices } from "./petAdoptionRequestService";
 import httpStatus from "http-status";
 
 const submitPetAdaptionRequest: RequestHandler = async (req, res, next) => {
@@ -18,8 +18,9 @@ const submitPetAdaptionRequest: RequestHandler = async (req, res, next) => {
 
 const getPetAdaptionRequests:RequestHandler = async(req,res,next) => {
     const token = req.headers.authorization as string;
+    const query = req.query
 
-    const result = await petAdaptionRequestServices.getAdaptionRequestFromDB(token)
+    const result = await petAdaptionRequestServices.getAdaptionRequestFromDB(token,query)
 
     res.send({
         success: true,

@@ -4,18 +4,22 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("POSTGRES_PRISMA_URL")
+  url      = env("POSTGRES_URL")
   // directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model User {
   id               String            @id @default(uuid())
   email            String            @unique
-  name             String
+  username         String            @unique
+  role             userRole          @default(USER)
+  isActive         Boolean           @default(true)
   password         String
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   adoptionRequests AdoptionRequest[]
+  adoptedPets      PetsAdopted[]
+  review           Review[]
 
   @@map("users")
 }
@@ -23,18 +27,23 @@ model User {
 model Pet {
   id                   String            @id @default(uuid())
   name                 String
-  species              String
+  type                 String
   breed                String
   age                  Int
-  size                 String
+  gender               gender
+  specialNeeds         String
+  size                 petSize
   location             String
+  photoURL             String?
   description          String
   temperament          String
   medicalHistory       String
+  healthStatus         healthStatus
   adoptionRequirements String
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
-  adoptionRequests      AdoptionRequest[]
+  adoptionRequests     AdoptionRequest[]
+  adoptedPets          PetsAdopted[]
 
   @@map("pets")
 }
@@ -50,11 +59,55 @@ model AdoptionRequest {
   createdAt              DateTime              @default(now())
   updatedAt              DateTime              @updatedAt
 
+  @@unique([userId, petId], name: "requestIdentifier")
   @@map("adoptionrequests")
+}
+
+model PetsAdopted {
+  id String @id @default(uuid())
+  userId    String
+  petId     String
+  user      User     @relation(fields: [userId], references: [id])
+  pet       Pet      @relation(fields: [petId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("petAdopteds")
+}
+
+model Review {
+  id          String @id @default(uuid())
+  userId      String
+  description String
+  user        User   @relation(fields: [userId], references: [id])
+
+  @@map("reviews")
 }
 
 enum adoptionRequestStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum userRole {
+  USER
+  ADMIN
+}
+
+enum healthStatus {
+  vaccinated
+  spayed
+  neutered
+}
+
+enum petSize {
+  small
+  medium
+  large
+}
+
+enum gender {
+  male
+  female
 }
